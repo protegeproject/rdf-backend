@@ -1,0 +1,158 @@
+<?xml version = "1.0" encoding = "UTF-8"?>
+<project name = "rdf-backend" default = "usage" basedir = ".">
+	<property name = "project.name" value = "rdf-backend"/>
+	<property name = "Name" value = "RDF Backend"/>
+	<property name = "build.dir" value = "./build"/>
+	<property name = "build.src" value = "${build.dir}/src"/>
+	<property name = "build.dest" value = "${build.dir}/classes"/>
+	<property name = "build.scripts" value = "./bin"/>
+	<property name = "docs.dir" value = "./docs"/>
+	<property name = "build.javadoc" value = "${docs.dir}/apidocs"/>
+	<property name = "lib.dir" value = "./lib"/>
+	<property name = "samples.dir" value = "./samples"/>
+	<property name = "deprecation" value = "on"/>    
+	<property name = "debug" value = "off"/>
+	<property name = "includeAntRuntime" value = "no"/>
+	<property name = "optimize" value = "on"/>
+	<property name = "packages" value = "edu.*"/>
+	<property name = "dist.dir" value = "./dist"/>
+	<property file = "../global.properties"/>
+	<!-- =================================================================== -->
+	
+	<!-- INIT -->
+	
+	<!-- Initialize properties. -->
+	
+	<!-- =================================================================== -->
+	<target name = "init">
+		<tstamp/>
+	</target>
+	<!-- =================================================================== -->
+	
+	<!-- PREPARE-SRC -->
+	
+	<!-- =================================================================== -->
+	<target name = "prepare-src" depends = "init">
+		<mkdir dir = "${build.src}"/>
+		<mkdir dir = "${build.dest}"/>
+		<mkdir dir = "${dist.dir}"/>
+		<!-- get source code from subversion repository -->
+		<exec executable = "cmd.exe" dir = "${batch.files}" os = "${os}">
+			<arg line = "/c checkout ${svn.core.url}/${project.name}/trunk ../${project.name} --non-recursive"/>
+		</exec>
+		<exec executable = "cmd.exe" dir = "${batch.files}" os = "${os}">
+			<arg line = "/c checkout ${svn.core.url}/${project.name}/trunk/src ../${project.name}/build/src"/>
+		</exec>
+		<exec executable = "cmd.exe" dir = "${batch.files}" os = "${os}">
+			<arg line = "/c checkout ${svn.core.url}/${project.name}/trunk/lib ../${project.name}/lib"/>
+		</exec>
+		<exec executable = "cmd.exe" dir = "${batch.files}" os = "${os}">
+			<arg line = "/c checkout ${svn.core.url}/${project.name}/trunk/docs ../${project.name}/docs"/>
+		</exec>
+		<exec executable = "cmd.exe" dir = "${batch.files}" os = "${os}">
+			<arg line = "/c checkout ${svn.core.url}/${project.name}/trunk/samples ../${project.name}/samples"/>
+		</exec>
+		<!-- add license text to top of source files -->
+		<exec executable = "cmd.exe" dir = "${batch.files}" os = "${os}">
+			<arg line = "/c merge_license_with_source ../${project.name}/build/src"/>
+		</exec>
+	</target>
+	<!-- =================================================================== -->
+	
+	<!-- COMPILE -->
+	
+	<!-- Compile the source directory. -->
+	
+	<!-- =================================================================== -->
+	<target name = "compile" depends = "prepare-src">
+		<!-- compile source code -->
+		<javac srcdir = "${build.src}" destdir = "${build.dest}" deprecation = "${deprecation}" debug = "${debug}" optimize = "${optimize}" includeAntRuntime = "${includeAntRuntime}">
+			<classpath>
+				<pathelement path = "${protege.jar}"/>
+				<fileset dir = "${lib.dir}">
+					<include name = "**/*.jar"/>
+				</fileset>
+			</classpath>
+		</javac>
+	</target>
+	<!-- =================================================================== -->
+	
+	<!-- JAR -->
+	
+	<!-- Create the class package. -->
+	
+	<!-- =================================================================== -->
+	<target name = "jar" depends = "compile">
+		<copy todir = "${build.dest}/edu/stanford/smi/protegex/storage/rdf/oil/files">
+			<fileset dir = "${build.src}/edu/stanford/smi/protegex/storage/rdf/oil/files"/>
+		</copy>
+		<jar jarfile = "${dist.dir}/${project.name}.jar" manifest = "${build.src}/META-INF//MANIFEST.MF">
+			<fileset dir = "${build.dest}"/>
+			<fileset dir = "." includes = "*readme*"/>
+		</jar>
+	</target>
+	<!-- =================================================================== -->
+	
+	<!-- JAVADOC -->
+	
+	<!-- Create the API documentation. -->
+	
+	<!-- =================================================================== -->
+	<target name = "javadoc" depends = "prepare-src">
+		<mkdir dir = "${build.javadoc}"/>
+		<javadoc packagenames = "${packages}" sourcepath = "${build.src}" destdir = "${build.javadoc}" doctitle = "${Name}" header = "${Name}" footer = "${Name}" windowtitle = "${Name}" author = "true">
+			<bottom><![CDATA[<small><a href=mailto:protege-help@smi.stanford.edu>Submit a bug report or feature request</a></small>]]></bottom>
+			<link href = "${jdk.javadoc}"/>
+			<link href = "${protege.javadoc}"/>
+			<link href = "http://www-db.stanford.edu/~melnik/rdf/api-doc/"/>
+			<classpath>
+				<pathelement path = "${protege.jar}"/>
+				<pathelement location = "${lib.dir}/rdf-api.jar"/>
+			</classpath>
+		</javadoc>
+	</target>
+	<!-- =================================================================== -->
+	
+	<!-- DIST -->
+	
+	<!-- Zips up all source code, resources, and api documentation. -->
+	
+	<!-- =================================================================== -->
+	<target name = "dist" depends = "init">
+		<zip zipfile = "${dist.dir}/${project.name}-src-${version}.zip" update = "no">
+			<zipfileset dir = "${build.src}" prefix = "${Name}/src"/>
+			<zipfileset dir = "${build.javadoc}" prefix = "${Name}/docs/apidocs"/>
+			<zipfileset dir = "${samples.dir}" prefix = "${Name}/samples"/>
+			<zipfileset dir = "." includes = "readme" prefix = "${Name}"/>
+		</zip>
+		<zip zipfile = "${dist.dir}/${project.name}-bin-${version}.zip" update = "no">
+			<zipfileset dir = "${dist.dir}" includes = "${project.name}.jar" prefix = "edu.stanford.smi.protegex.rdf-backend"/>
+			<zipfileset dir = "${lib.dir}" includes = "rdf-api.jar" prefix = "edu.stanford.smi.protegex.rdf-backend"/>
+			<zipfileset dir = "${lib.dir}" includes = "xerces.jar" prefix = "edu.stanford.smi.protegex.rdf-backend"/>
+			<zipfileset dir = "${docs.dir}" includes = "plugin.properties" prefix = "edu.stanford.smi.protegex.rdf-backend"/>
+			<zipfileset dir = "${docs.dir}" includes = "about_rdf_backend.html" prefix = "edu.stanford.smi.protegex.rdf-backend"/>
+			<zipfileset dir = "." includes = "readme" prefix = "edu.stanford.smi.protegex.rdf-backend"/>
+		</zip>
+	</target>
+	<!-- =================================================================== -->
+	
+	<!-- CLEAN -->
+	
+	<!-- Cleans all generated files and directories. -->
+	
+	<!-- =================================================================== -->
+	<target name = "clean" depends = "init">
+		<delete dir = "${build.dir}"/>
+		<delete dir = "${docs.dir}"/>
+		<delete dir = "${dist.dir}"/>
+		<delete dir = "${samples.dir}"/>
+	</target>
+	<!-- =================================================================== -->
+	
+	<!-- ALL -->
+	
+	<!-- Create the jar file, javadoc api documentaion, and the zip file. -->
+	
+	<!-- =================================================================== -->
+	<target name = "all" depends = "jar,javadoc,dist"/>
+</project>
