@@ -1,12 +1,9 @@
 package edu.stanford.smi.protegex.storage.rdf.configurable;
 
-import java.net.*;
 import java.util.*;
 
 import edu.stanford.smi.protege.model.*;
 import edu.stanford.smi.protege.plugin.*;
-import edu.stanford.smi.protege.storage.clips.*;
-import edu.stanford.smi.protege.storage.database.*;
 import edu.stanford.smi.protege.util.*;
 
 /**
@@ -18,11 +15,11 @@ public class RDFCreateProjectPlugin extends AbstractCreateProjectPlugin implemen
     private String clsesFileName;
     private String instancesFileName;
     private String namespace;
-    
+
     public RDFCreateProjectPlugin() {
         super(RDFCBackend.DESCRIPTION);
     }
-    
+
     protected void importIntoProject(Project project, Collection errors) {
         KnowledgeBase kb = project.getKnowledgeBase();
         RDFCBackend backend = (RDFCBackend) kb.getKnowledgeBaseFactory();
@@ -43,12 +40,16 @@ public class RDFCreateProjectPlugin extends AbstractCreateProjectPlugin implemen
         }
         return page;
     }
-    
+
+    protected void initializeSources(PropertyList sources) {
+        RDFCBackend.setSourceFiles(sources, clsesFileName, instancesFileName, namespace);
+    }
+
     public void setFiles(String clsesFileName, String instancesFileName) {
         this.clsesFileName = clsesFileName;
         this.instancesFileName = instancesFileName;
     }
-    
+
     public void setNamespace(String namespace) {
         this.namespace = namespace;
     }
