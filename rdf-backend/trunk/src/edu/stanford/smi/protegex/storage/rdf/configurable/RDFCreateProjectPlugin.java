@@ -42,7 +42,8 @@ public class RDFCreateProjectPlugin extends AbstractCreateProjectPlugin implemen
     }
 
     protected void initializeSources(PropertyList sources) {
-        RDFCBackend.setSourceFiles(sources, clsesFileName, instancesFileName, namespace);
+        RDFCBackend.setSourceFiles(sources, FileUtilities.getName(clsesFileName), FileUtilities
+                .getName(instancesFileName), namespace);
     }
 
     public void setFiles(String clsesFileName, String instancesFileName) {
