@@ -1,5 +1,7 @@
 package edu.stanford.smi.protegex.storage.rdf.configurable;
 
+import java.io.*;
+import java.net.*;
 import java.util.*;
 
 import edu.stanford.smi.protege.model.*;
@@ -41,6 +43,13 @@ public class RDFCreateProjectPlugin extends AbstractCreateProjectPlugin implemen
         return page;
     }
 
+    protected URI getBuildProjectURI() {
+        String name = clsesFileName.substring(0, clsesFileName.length() - 5);
+        name += ".pprj";
+        File file = new File(name);
+        return file.toURI();
+    }
+    
     protected void initializeSources(PropertyList sources) {
         RDFCBackend.setSourceFiles(sources, FileUtilities.getName(clsesFileName), FileUtilities
                 .getName(instancesFileName), namespace);
