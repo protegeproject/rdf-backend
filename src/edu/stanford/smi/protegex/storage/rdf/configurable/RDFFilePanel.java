@@ -46,6 +46,6 @@ public class RDFFilePanel extends JComponent {
     }
 
     public String getNamespace() {
-        return "http://protege.stanford.edu/rdf";
+        return namespaceField.getText();
     }
 }
