@@ -1,8 +1,9 @@
-README for RDF Schema backend
+README for RDF Schema back-end
 
 
 CHANGES
 
+13-SEP-06  minor documentation updates
 01-MAR-04  updated installation instructions
 04-Jun-03  updated installation instructions
 18-Mar-02  fixed bug that messed range and constraints of included properties
@@ -13,19 +14,27 @@ CHANGES
 18-Jan-01  first public beta release
 
 
+PLEASE NOTE
+
+We now have a Wiki page for the RDF back-end on the Protege Wiki:
+
+http://protege.cim3.net/cgi-bin/wiki.pl?RDFBackend
+
+There is also a page on the Protege Wiki that may be of interest that 
+helps users choose which editor to use to edit RDF ontologies 
+(i.e., the Protege-Frames editor or the Protege-OWL editor):
+
+http://protege.cim3.net/cgi-bin/wiki.pl?ChoosingUI
+
+
 INSTALLATION
 
-Please note that these instructions are *only* applicable if you're using
-Protege 1.9 and higher.  If you're using any previous version of Protege, 
-the RDF Backend came as part of the standard installation.
+The RDF back-end is bundled with the "full" installation of Protege.  If you 
+installed the full version, you don't need to do anything else.  To confirm 
+that the back-end has been installed, you can check that the following directory 
+exists:
 
-1. Unzip the rdf_backend.jar and rdf-api.jar files into your Protege\plugins 
-   directory.  Make sure you preserve the path information in the ZIP file 
-   so that the proper subdirectory is created under the plugins directory for 
-   the JAR files.  After unzipping, you should have something like:
-
-   Protege\plugins\edu.stanford.smi.protegex.rdf_backend\rdf_backend.jar
-   Protege\plugins\edu.stanford.smi.protegex.rdf_backend\rdf-api.jar
+<protege-install-dir>/plugins/edu.stanford.smi.protegex.rdf_backend/
 
 
 OVERVIEW
@@ -78,7 +87,6 @@ Here is how it works:
    default namespace, load and change the namespace (via "Save as").
 
 4. You can now load the main project.
-
 
 
 KNOWN BUGS AND PROBLEMS
