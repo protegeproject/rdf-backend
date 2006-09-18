@@ -49,15 +49,6 @@
    </target>
 
 
-   <target name = "junit-compile" depends = "compile">    
-     <javac srcdir = "${junit}" destdir = "${classes}" debug="on">
-       <classpath refid = "project.classpath"/>
-       <classpath>
-         <pathelement location = "${classes}"/>
-       </classpath>       
-     </javac>    
-   </target>
-
    <target name = "clean">
      <delete dir = "${dist}"/>
      <delete dir = "${classes}"/>
