@@ -1,0 +1,66 @@
+<?xml version = "1.0" encoding = "utf-8"?>
+<project name = "Developer Plugins" default = "dist" basedir = ".">    
+   <property name = "src" value = "./src"/>  
+   <property name = "classes" value = "./classes"/>  
+   <property name = "dist" value = "./dist"/>
+   <property name = "lib" value = "./lib"/>
+   <property name = "plugin_dir" value = "edu.stanford.smi.protegex.rdf_backend"/>
+   <property name = "pluginName" value = "rdf-backend"/>
+	
+   <path id = "project.classpath"> 
+     <pathelement location = "${lib}/protege.jar"/>
+     <pathelement location = "${lib}/rdf-api.jar"/>
+     <pathelement location = "${lib}/xerces.jar"/>
+   </path>
+
+   <target name = "init">
+     <mkdir dir = "${classes}"/>
+     <mkdir dir = "${dist}"/>
+     <mkdir dir = "${dist}/${plugin_dir}"/>
+   </target>  
+
+
+   <target name = "compile" depends = "init">    
+     <javac srcdir = "${src}" destdir = "${classes}" debug="on">
+       <classpath refid = "project.classpath"/>    
+     </javac>    
+   </target>
+
+   <target name = "jar" depends = "compile">
+     <jar jarfile = "${dist}/${plugin_dir}/${pluginName}.jar" 
+          basedir = "${classes}" 
+          manifest = "${src}/META-INF/MANIFEST.MF"/>  
+     <copy todir = "${dist}/${plugin_dir}"
+           file = "readme"/>
+     <copy todir = "${dist}/${plugin_dir}"
+           file = "docs/about_rdf_backend.html"/>
+     <copy todir = "${dist}/${plugin_dir}"
+           file = "docs/plugin.properties"/>
+     <copy todir = "${dist}/${plugin_dir}"
+           file = "lib/rdf-api.jar"/>
+     <copy todir = "${dist}/${plugin_dir}"
+           file = "lib/xerces.jar"/>
+   </target>
+
+   <target name = "dist" depends = "jar">
+     <zip basedir = "${dist}"
+          includes = "${plugin_dir}/**"
+          destfile = "${dist}/${pluginName}.zip"/>
+   </target>
+
+
+   <target name = "junit-compile" depends = "compile">    
+     <javac srcdir = "${junit}" destdir = "${classes}" debug="on">
+       <classpath refid = "project.classpath"/>
+       <classpath>
+         <pathelement location = "${classes}"/>
+       </classpath>       
+     </javac>    
+   </target>
+
+   <target name = "clean">
+     <delete dir = "${dist}"/>
+     <delete dir = "${classes}"/>
+   </target>
+
+</project>
