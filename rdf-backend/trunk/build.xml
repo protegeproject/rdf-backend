@@ -133,19 +133,15 @@
 
 
    <target name = "install" depends = "dist">
-      <fail message = "set the protege.dir variable to do an install">
+      <fail message = "set the protege.home variable to do an install">
          <condition>
             <not>
-               <and>
-                  <isset property="protege.dir"/>
-                  <available file="${protege.dir}"
-                             type="dir"/>
-               </and>
+              <isset property="protege.home.set"/>
             </not>
          </condition>
       </fail>
       <unzip src="dist/${pluginName}.zip" 
-             dest = "${protege.dir}/plugins"
+             dest = "${protege.home}/plugins"
              overwrite = "true"/>
    </target>
 
