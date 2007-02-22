@@ -604,4 +604,21 @@ public class ProtegeFrameCreator implements FrameCreator {
         exc.printStackTrace();
     }
 
+    //added to support multiple types
+	public void addTypesToInstance(WalkerFrame wframe, Collection wTypes) {
+		
+		Instance instance = getInstance(wframe);
+		
+		for (Iterator iter = wTypes.iterator(); iter.hasNext();) {
+			WalkerFrame wType = (WalkerFrame) iter.next();
+		
+			Cls type = getCls(wType);
+			
+			if (type != null && !instance.hasType(type)) {
+				instance.addDirectType(type);
+			}
+		}
+		
+	}
+
 }

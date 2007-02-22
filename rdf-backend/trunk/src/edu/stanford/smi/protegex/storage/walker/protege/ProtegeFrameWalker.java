@@ -3,6 +3,9 @@ package edu.stanford.smi.protegex.storage.walker.protege;
 import java.util.*;
 
 import edu.stanford.smi.protege.model.*;
+import edu.stanford.smi.protege.util.CollectionUtilities;
+import edu.stanford.smi.protege.util.Log;
+import edu.stanford.smi.protegex.storage.rdf.RDFFrameCreator;
 import edu.stanford.smi.protegex.storage.walker.*;
 
 public class ProtegeFrameWalker implements FrameWalker {
@@ -63,13 +66,35 @@ public class ProtegeFrameWalker implements FrameWalker {
             if (instance instanceof SimpleInstance // no classes and slots
                 // || instance instanceof Facet) // ??? FACET
                 && exportFrame(instance)) {
-                Cls type = instance.getDirectType();
-                if (type == null) { // whould never happen!
-                    System.err.println("WARNING: instance has no direct type: " + instance);
-                    type = _kb.getRootCls(); // use :THING
+            	
+            	String documentation = getDocumentation(instance);
+            	
+            	//TT:adding support for multiple types            	
+                Collection types = instance.getDirectTypes();
+                                                
+                if (types == null || types.size() == 0) { // whould never happen!
+                    Log.getLogger().warning("Instance has no direct type: " + instance);
+                    types = _kb.getRootClses(); // use :THING
                 }
-                String documentation = getDocumentation(instance);
-                _creator.createInstance(wframe(instance), wframe(type), documentation);
+                
+                // backwards compatibility
+                if (!(_creator instanceof RDFFrameCreator)) {
+                	_creator.createInstance(wframe(instance), wframe((Frame)CollectionUtilities.getFirstItem(types)), documentation);
+                	return;
+                }
+                
+                Collection wTypes = new ArrayList();
+                
+                for (Iterator iter = types.iterator(); iter.hasNext();) {
+					Cls type = (Cls) iter.next();
+				
+					WalkerFrame  wType = wframe(type);
+					wTypes.add(wType);
+										
+				}   
+                
+                ((RDFFrameCreator)_creator).createInstance(wframe(instance), wTypes, documentation);
+                
             }
         }
     }
