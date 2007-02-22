@@ -100,6 +100,18 @@ public class RDFFrameCreator implements FrameCreator {
         addComment(_rdfModel, instResource, documentation);
         addLabel(_rdfModel, inst);
     }
+    
+    //TT added to support multiple types
+    public void createInstance(WalkerFrame inst, Collection types, String documentation) {        
+        Resource instResource = resource(inst);        
+        addComment(_rdfModel, instResource, documentation);
+        addLabel(_rdfModel, inst);
+        
+        for (Iterator iter = types.iterator(); iter.hasNext();) {
+			WalkerFrame type = (WalkerFrame) iter.next();
+			add(_rdfModel, statement(instResource, RDF.type, resource(type)));	
+		}        
+    }    
 
     public void createSlot(
         WalkerFrame slot,
@@ -419,5 +431,6 @@ public class RDFFrameCreator implements FrameCreator {
         _errors.add(exc.toString());
         exc.printStackTrace();
     }
+
 
 }

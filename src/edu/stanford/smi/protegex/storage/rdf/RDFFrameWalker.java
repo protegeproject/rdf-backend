@@ -13,6 +13,7 @@ import org.xml.sax.*;
 
 import edu.stanford.db.rdf.schema.*;
 import edu.stanford.smi.protege.util.*;
+import edu.stanford.smi.protegex.storage.rdf.configurable.RDFCreateProjectPlugin;
 import edu.stanford.smi.protegex.storage.walker.*;
 import edu.stanford.smi.protegex.storage.walker.protege.*;
 
@@ -281,9 +282,16 @@ public class RDFFrameWalker implements FrameWalker {
             Map.Entry unhandled = (Map.Entry) utIterator.next();
             Resource resource = (Resource) unhandled.getKey();
             Collection types = (Collection) unhandled.getValue();
-            error("resource with more than one type not yet handled: " + resource + " ; unhandled types = " + types);
-            // use addOwnSlotValues here if we add missing template slots
-            // (i.e., rdf:type) ... !!!
+            
+            //TT added support for multiple types
+            if (!(_creator instanceof ProtegeFrameCreator)) {
+                error("Resource with more than one type not yet handled: " + resource + " ; unhandled types = " + types);
+                // use addOwnSlotValues here if we add missing template slots
+                // (i.e., rdf:type) ... !!!
+            } else {
+            	((ProtegeFrameCreator)_creator).addTypesToInstance(wframe(resource), wframes(types));
+            }            
+            
         }
     }
 
