@@ -3,6 +3,7 @@ README for RDF Schema back-end
 
 CHANGES
 
+21-MAR-07  added support for multiple instance types
 13-SEP-06  minor documentation updates
 01-MAR-04  updated installation instructions
 04-Jun-03  updated installation instructions
@@ -99,8 +100,6 @@ KNOWN BUGS AND PROBLEMS
 - rdfs:seeAlso, rdfs:isDefinedBy, rdfs:label, container, and reified statements
   are not supported
   
-- multiple types for a single resource are not supported
-
 - you cannot make changes to the standard meta classes (i.e., rdf:Resource,
   rdf:Property, rdfs:Class, etc.)
 
@@ -117,8 +116,8 @@ KNOWN BUGS AND PROBLEMS
     (in separate namespace)
   
   
-Report bugs, suggestions, comments to:
+Report bugs, suggestions, comments to the protege-discussion mailing list:
 
-Michael Sintek
-email: sintek@smi.stanford.edu
+protege-discussion@lists.stanford.edu
+
 
