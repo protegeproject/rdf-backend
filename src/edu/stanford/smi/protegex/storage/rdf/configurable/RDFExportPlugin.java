@@ -54,7 +54,14 @@ public class RDFExportPlugin implements ExportPlugin {
     public static boolean isSuitable(Project prj) {
     	if (prj == null)
     		return false;
-        String factoryName = prj.getKnowledgeBaseFactory().getClass().getName();
+    	KnowledgeBaseFactory factory = prj.getKnowledgeBaseFactory();
+    	
+    	//This is the case of a multi-client
+    	if (factory == null) {
+    		return false;
+    	}
+    	
+        String factoryName = factory.getClass().getName();
         return factoryName.indexOf(".owl.") == -1;
       // return (prj != null && prj.getKnowledgeBaseFactory() instanceof ClipsKnowledgeBaseFactory);
     }
