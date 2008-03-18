@@ -1,0 +1,155 @@
+<?xml version = "1.0" encoding = "utf-8"?>
+<project name = "Developer Plugins" default = "dist" basedir = ".">    
+    <property environment="env"/>
+    <property name="protege.home" value="${env.PROTEGE_HOME}"/>
+
+   <property name = "src" value = "./src"/>  
+   <property name = "classes" value = "./classes"/>  
+   <property name = "dist" value = "./dist"/>
+   <property name = "lib" value = "./lib"/>
+   <property name = "plugin_dir" value = "edu.stanford.smi.protegex.rdf_backend"/>
+   <property name = "pluginName" value = "rdf-backend"/>
+
+
+    <!-- Compiler options. -->
+    <property name = "deprecation" value = "on"/>    
+    <property name = "debug" value = "on"/>  
+    <property name = "optimize" value = "on"/>  
+    <property name = "packages" value = "edu.*"/>  
+    <property name = "includeAntRuntime" value = "no"/>
+    <property name = "source" value = "1.5"/>
+
+
+    <!-- 
+       #  ********** Finding Protege Libraries. *************
+       # 
+       #  We are using an approach that allows developers to decide
+       #  whether to hand copy the needed jars into the lib directory or
+       #  to point them to a protege installation.
+      -->
+    <target name="checkProtegeHome">
+      <condition property="protege.home.set">
+        <available file="${protege.home}/protege.jar" type="file"/>
+      </condition>
+    </target>
+    
+    <target name="useProtegeHome" depends="checkProtegeHome" 
+            if="protege.home.set">
+      <echo message="Using Protege Home = ${protege.home} to find protege jars"/>
+      <property name="protege.lib" value="${protege.home}/protege.jar"/>
+    </target>
+    
+    <target name="useLibDir" depends="checkProtegeHome" 
+            unless="protege.home.set">
+       <echo message="Using lib dir to find protege jars"/>
+      <property name="protege.lib" value="${lib}/protege.jar"/>
+    </target>
+
+
+    <target name = "checkProtegeLibs" depends="useProtegeHome, useLibDir">
+      <condition property="libs.found">
+        <and>
+          <available file="${protege.lib}" type = "file"/>
+        </and>
+      </condition>
+      <path id = "project.classpath"> 
+         <pathelement location = "${protege.lib}"/>
+         <pathelement location = "${lib}/rdf-api.jar"/>
+         <pathelement location = "${lib}/xerces.jar"/>
+      </path>
+    </target>
+
+    <target name="checkProtegeLibsAndReport" depends="checkProtegeLibs"
+            unless="libs.found">
+      <echo message="Missing protege libraries.  You can either "/>
+      <echo message="set the PROTEGE_HOME environment variable to a"/>
+      <echo message="protege installation directory where the"/>
+      <echo message="appropriate plugins have been installed or copy the"/>
+      <echo message="needed jars into the lib directory"/>
+      <echo message="The jar file in question is protege.jar."/>
+      <fail message="build aborted."/>
+    </target>
+      
+   <!-- 
+     #  ********** Finding Protege Libraries Done. *************
+     -->
+	
+
+   <target name = "init">
+     <mkdir dir = "${classes}"/>
+     <mkdir dir = "${dist}"/>
+     <mkdir dir = "${dist}/${plugin_dir}"/>
+   </target>  
+
+
+   <target name = "compile" depends = "init,checkProtegeLibsAndReport">    
+     <javac srcdir = "${src}" destdir = "${classes}" 
+            deprecation = "{deprecation}" 
+            debug = "${debug}" 
+            optimize = "${optimize}" 
+            includeAntRuntime = "${includeAntRuntime}" 
+            source = "${source}">
+       <classpath refid = "project.classpath"/>    
+     </javac>    
+   </target>
+
+   <target name = "jar" depends = "compile">
+     <jar jarfile = "${dist}/${plugin_dir}/${pluginName}.jar" 
+          basedir = "${classes}" 
+          manifest = "${src}/META-INF/MANIFEST.MF"/>  
+     <copy todir = "${dist}/${plugin_dir}"
+           file = "readme"/>
+     <copy todir = "${dist}/${plugin_dir}"
+           file = "docs/about_rdf_backend.html"/>
+     <copy todir = "${dist}/${plugin_dir}"
+           file = "docs/plugin.properties"/>
+     <copy todir = "${dist}/${plugin_dir}"
+           file = "lib/rdf-api.jar"/>
+     <copy todir = "${dist}/${plugin_dir}"
+           file = "lib/xerces.jar"/>
+   </target>
+
+   <target name = "dist" depends = "jar">
+     <zip basedir = "${dist}"
+          includes = "${plugin_dir}/**"
+          destfile = "${dist}/${pluginName}.zip"/>
+   </target>
+
+
+    <target name = "update" depends = "jar">
+      <fail message = "The Protege Home variable must be set for an install">
+         <condition>
+            <not>
+               <and>
+                  <isset property="protege.home.set"/>
+               </and>
+            </not>
+         </condition>
+      </fail>
+      <copy file="dist/${plugin_dir}/${pluginName}.jar"
+            todir = "${protege.home}/plugins/${plugin_dir}"
+            overwrite = "true"/>
+   </target>
+
+
+   <target name = "install" depends = "dist">
+      <fail message = "set the protege.home variable to do an install">
+         <condition>
+            <not>
+              <isset property="protege.home.set"/>
+            </not>
+         </condition>
+      </fail>
+      <unzip src="dist/${pluginName}.zip" 
+             dest = "${protege.home}/plugins"
+             overwrite = "true"/>
+   </target>
+
+
+
+   <target name = "clean">
+     <delete dir = "${dist}"/>
+     <delete dir = "${classes}"/>
+   </target>
+
+</project>
