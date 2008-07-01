@@ -1,0 +1,97 @@
+<?xml version = "1.0" encoding = "UTF-8"?>
+<project name = "rdf-backend" default = "init" basedir = ".">
+
+	<property name = "project.name" value = "rdf-backend"/>
+	<property name = "build.dir" value = "./build"/>
+	<property name = "build.src" value = "${build.dir}/src"/>
+	<property name = "build.dest" value = "${build.dir}/classes"/>
+	<property name = "docs.dir" value = "./docs"/>
+	<property name = "lib.dir" value = "./lib"/>
+	<property name = "samples.dir" value = "./samples"/>
+	<property name = "deprecation" value = "off"/>    
+	<property name = "debug" value = "off"/>
+	<property name = "includeAntRuntime" value = "no"/>
+	<property name = "optimize" value = "on"/>
+	<property name = "packages" value = "edu.*"/>
+	<property name = "dist.dir" value = "./dist"/>
+
+	<property file = "../global.properties"/>
+
+	<target name = "init">
+		<tstamp/>
+	</target>
+
+	<!-- =================================================================== -->
+	<!-- PREPARE-SRC -->
+	<!-- =================================================================== -->
+	<target name = "prepare-src" depends = "init">
+		<mkdir dir = "${build.src}"/>
+		<mkdir dir = "${build.dest}"/>
+		<mkdir dir = "${dist.dir}"/>
+
+		<!-- get source code from subversion repository -->
+		<exec executable = "cmd.exe" dir = "${batch.files}" os = "${os}">
+			<arg line = "/c checkout ${svn.core.url}/${project.name}/trunk ../${project.name} --non-recursive"/>
+		</exec>
+		<exec executable = "cmd.exe" dir = "${batch.files}" os = "${os}">
+			<arg line = "/c checkout ${svn.core.url}/${project.name}/trunk/src ../${project.name}/build/src"/>
+		</exec>
+		<exec executable = "cmd.exe" dir = "${batch.files}" os = "${os}">
+			<arg line = "/c checkout ${svn.core.url}/${project.name}/trunk/lib ../${project.name}/lib"/>
+		</exec>
+		<exec executable = "cmd.exe" dir = "${batch.files}" os = "${os}">
+			<arg line = "/c checkout ${svn.core.url}/${project.name}/trunk/docs ../${project.name}/docs"/>
+		</exec>
+		<exec executable = "cmd.exe" dir = "${batch.files}" os = "${os}">
+			<arg line = "/c checkout ${svn.core.url}/${project.name}/trunk/samples ../${project.name}/samples"/>
+		</exec>
+
+		<!-- add license text to top of source files -->
+		<exec executable = "cmd.exe" dir = "${batch.files}" os = "${os}">
+			<arg line = "/c merge_license_with_source ../${project.name}/build/src"/>
+		</exec>
+	</target>
+
+	<!-- =================================================================== -->
+	<!-- COMPILE -->
+	<!-- =================================================================== -->
+	<target name = "compile" depends = "prepare-src">
+		<javac srcdir = "${build.src}" destdir = "${build.dest}" deprecation = "${deprecation}" debug = "${debug}" optimize = "${optimize}" includeAntRuntime = "${includeAntRuntime}">
+			<classpath>
+				<pathelement path = "${protege.jar}"/>
+				<fileset dir = "${lib.dir}">
+					<include name = "**/*.jar"/>
+				</fileset>
+			</classpath>
+		</javac>
+	</target>
+
+	<!-- =================================================================== -->
+	<!-- JAR -->
+	<!-- =================================================================== -->
+	<target name = "jar" depends = "compile">
+		<copy todir = "${build.dest}/edu/stanford/smi/protegex/storage/rdf/oil/files">
+			<fileset dir = "${build.src}/edu/stanford/smi/protegex/storage/rdf/oil/files"/>
+		</copy>
+		<jar jarfile = "${dist.dir}/${project.name}.jar" manifest = "${build.src}/META-INF/MANIFEST.MF">
+			<fileset dir = "${build.dest}"/>
+			<fileset dir = "." includes = "*readme*"/>
+		</jar>
+	</target>
+
+	<!-- =================================================================== -->
+	<!-- CLEAN -->
+	<!-- =================================================================== -->
+	<target name = "clean" depends = "init">
+		<delete dir = "${build.dir}"/>
+		<delete dir = "${docs.dir}"/>
+		<delete dir = "${dist.dir}"/>
+		<delete dir = "${samples.dir}"/>
+		<delete dir = "${lib.dir}"/>
+	</target>
+
+	<!-- =================================================================== -->
+	<!-- ALL -->
+	<!-- =================================================================== -->
+	<target name = "all" depends = "jar"/>
+</project>
