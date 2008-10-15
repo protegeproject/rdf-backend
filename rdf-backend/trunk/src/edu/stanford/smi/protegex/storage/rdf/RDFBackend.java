@@ -1,14 +1,20 @@
 package edu.stanford.smi.protegex.storage.rdf;
 
-import java.io.*;
-import java.util.*;
+import java.io.Writer;
+import java.util.Collection;
 
-import org.xml.sax.*;
+import org.xml.sax.InputSource;
 
-import edu.stanford.smi.protege.model.*;
-import edu.stanford.smi.protege.util.*;
-import edu.stanford.smi.protegex.storage.walker.protege.*;
-// #RV
+import edu.stanford.smi.protege.model.KnowledgeBase;
+import edu.stanford.smi.protege.model.KnowledgeBaseFactory;
+import edu.stanford.smi.protege.model.KnowledgeBaseSourcesEditor;
+import edu.stanford.smi.protege.model.Project;
+import edu.stanford.smi.protege.util.FileUtilities;
+import edu.stanford.smi.protege.util.PropertyList;
+import edu.stanford.smi.protege.util.SystemUtilities;
+import edu.stanford.smi.protegex.storage.walker.protege.Namespaces;
+import edu.stanford.smi.protegex.storage.walker.protege.ProtegeFrameCreator;
+import edu.stanford.smi.protegex.storage.walker.protege.ProtegeFrameWalker;
 
 public class RDFBackend implements KnowledgeBaseFactory {
 
@@ -24,7 +30,7 @@ public class RDFBackend implements KnowledgeBaseFactory {
             // this happens in applets, ignore it.
         }
     }
-    
+
     // methods from the KnowledgeBaseFactory interface ----------------
 
     // override in subclasses
@@ -98,15 +104,15 @@ public class RDFBackend implements KnowledgeBaseFactory {
 
     // stuff needed for RDFSourcesEditor -------------------------------
 
-    static String getClsesFileName(PropertyList sources) {
+    public static String getClsesFileName(PropertyList sources) {
         return sources.getString(CLASS_FILE_NAME_PROPERTY);
     }
 
-    static String getInstancesFileName(PropertyList sources) {
+    public static String getInstancesFileName(PropertyList sources) {
         return sources.getString(INSTANCE_FILE_NAME_PROPERTY);
     }
 
-    static String getNamespace(PropertyList sources) {
+    public static String getNamespace(PropertyList sources) {
         return sources.getString(NAMESPACE_PROPERTY);
     }
 
@@ -118,10 +124,12 @@ public class RDFBackend implements KnowledgeBaseFactory {
         sources.setString(CLASS_FILE_NAME_PROPERTY, classesFileName);
         sources.setString(INSTANCE_FILE_NAME_PROPERTY, instancesFileName);
         if (namespace != null) {
-            if (!(namespace.endsWith("#") || namespace.endsWith("/") || namespace.endsWith(":")))
-                namespace = namespace + "#"; // ????
-            if (namespace.indexOf(' ') != -1)
-                namespace = namespace.replace(' ', '_');
+            if (!(namespace.endsWith("#") || namespace.endsWith("/") || namespace.endsWith(":"))) {
+				namespace = namespace + "#"; // ????
+			}
+            if (namespace.indexOf(' ') != -1) {
+				namespace = namespace.replace(' ', '_');
+			}
         }
         sources.setString(NAMESPACE_PROPERTY, namespace);
     }
@@ -138,11 +146,13 @@ public class RDFBackend implements KnowledgeBaseFactory {
         // the following code is "fragile" since we need information
         // from the including project (and we even change it!)
         String classesFileName = getClsesFileName(sources);
-        if (classesFileName != null)
-            classesFileName = FileUtilities.getAbsolutePath(classesFileName, kb.getProject());
+        if (classesFileName != null) {
+			classesFileName = FileUtilities.getAbsolutePath(classesFileName, kb.getProject());
+		}
         String instancesFileName = getInstancesFileName(sources);
-        if (instancesFileName != null)
-            instancesFileName = FileUtilities.getAbsolutePath(instancesFileName, kb.getProject());
+        if (instancesFileName != null) {
+			instancesFileName = FileUtilities.getAbsolutePath(instancesFileName, kb.getProject());
+		}
         String namespace = getNamespace(sources);
         Namespaces namespaces;
         if (included && kb instanceof RDFKnowledgeBase) {
@@ -185,8 +195,9 @@ public class RDFBackend implements KnowledgeBaseFactory {
             errors.add("Fatal error: " + e);
             e.printStackTrace();
         }
-        if (included && kb instanceof RDFKnowledgeBase)
-             ((RDFKnowledgeBase) kb).finishIncludedProject();
+        if (included && kb instanceof RDFKnowledgeBase) {
+			((RDFKnowledgeBase) kb).finishIncludedProject();
+		}
     }
 
     // #RV
@@ -252,11 +263,13 @@ public class RDFBackend implements KnowledgeBaseFactory {
 
     void save(KnowledgeBase kb, PropertyList sources, Collection errors) {
         String classesFileName = getClsesFileName(sources);
-        if (classesFileName != null)
-            classesFileName = FileUtilities.getAbsolutePath(classesFileName, kb.getProject());
+        if (classesFileName != null) {
+			classesFileName = FileUtilities.getAbsolutePath(classesFileName, kb.getProject());
+		}
         String instancesFileName = getInstancesFileName(sources);
-        if (instancesFileName != null)
-            instancesFileName = FileUtilities.getAbsolutePath(instancesFileName, kb.getProject());
+        if (instancesFileName != null) {
+			instancesFileName = FileUtilities.getAbsolutePath(instancesFileName, kb.getProject());
+		}
         String namespace = getNamespace(sources);
         Namespaces namespaces = new Namespaces(namespace, sources);
         try {
