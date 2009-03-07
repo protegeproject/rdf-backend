@@ -1,21 +1,40 @@
 package edu.stanford.smi.protegex.storage.rdf;
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
-import org.w3c.rdf.model.*;
-import org.w3c.rdf.syntax.*;
-import org.w3c.rdf.util.*;
-// import org.w3c.rdf.vocabulary.rdf_schema_19990303.*;
-import org.w3c.rdf.vocabulary.rdf_schema_200001.*;
-import org.w3c.rdf.vocabulary.rdf_syntax_19990222.*;
-import org.xml.sax.*;
+import org.w3c.rdf.model.Model;
+import org.w3c.rdf.model.RDFNode;
+import org.w3c.rdf.model.Resource;
+import org.w3c.rdf.model.Statement;
+import org.w3c.rdf.syntax.RDFConsumer;
+import org.w3c.rdf.syntax.RDFParser;
+import org.w3c.rdf.util.ModelConsumer;
+import org.w3c.rdf.util.RDFFactory;
+import org.w3c.rdf.util.RDFFactoryImpl;
+import org.w3c.rdf.util.SetOperations;
+import org.w3c.rdf.vocabulary.rdf_schema_200001.RDFS;
+import org.w3c.rdf.vocabulary.rdf_syntax_19990222.RDF;
+import org.xml.sax.InputSource;
 
-import edu.stanford.db.rdf.schema.*;
-import edu.stanford.smi.protege.util.*;
-import edu.stanford.smi.protegex.storage.rdf.configurable.RDFCreateProjectPlugin;
-import edu.stanford.smi.protegex.storage.walker.*;
-import edu.stanford.smi.protegex.storage.walker.protege.*;
+import edu.stanford.db.rdf.schema.RDFSchemaModel;
+import edu.stanford.smi.protege.util.CollectionUtilities;
+import edu.stanford.smi.protege.util.URIUtilities;
+import edu.stanford.smi.protegex.storage.walker.FrameCreator;
+import edu.stanford.smi.protegex.storage.walker.FrameWalker;
+import edu.stanford.smi.protegex.storage.walker.WalkerFrame;
+import edu.stanford.smi.protegex.storage.walker.WalkerSlotRestriction;
+import edu.stanford.smi.protegex.storage.walker.protege.Namespaces;
+import edu.stanford.smi.protegex.storage.walker.protege.ProtegeFrameCreator;
 
 public class RDFFrameWalker implements FrameWalker {
 
@@ -578,7 +597,7 @@ public class RDFFrameWalker implements FrameWalker {
         Model model = _rdfFactory.createModel();
         if (fileName != null) {
             RDFParser parser = _rdfFactory.createParser();
-            BufferedReader reader = FileUtilities.createBufferedReader(fileName);
+            BufferedReader reader = URIUtilities.createBufferedReader(URIUtilities.createURI(fileName));
             InputSource source = new InputSource(reader);
             source.setSystemId(_namespace);
             // NOT: _namespaces.getDefaultNamespace()
