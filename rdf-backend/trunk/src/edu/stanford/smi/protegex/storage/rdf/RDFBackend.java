@@ -12,6 +12,7 @@ import edu.stanford.smi.protege.model.Project;
 import edu.stanford.smi.protege.util.FileUtilities;
 import edu.stanford.smi.protege.util.PropertyList;
 import edu.stanford.smi.protege.util.SystemUtilities;
+import edu.stanford.smi.protege.util.URIUtilities;
 import edu.stanford.smi.protegex.storage.walker.protege.Namespaces;
 import edu.stanford.smi.protegex.storage.walker.protege.ProtegeFrameCreator;
 import edu.stanford.smi.protegex.storage.walker.protege.ProtegeFrameWalker;
@@ -146,12 +147,12 @@ public class RDFBackend implements KnowledgeBaseFactory {
         // the following code is "fragile" since we need information
         // from the including project (and we even change it!)
         String classesFileName = getClsesFileName(sources);
-        if (classesFileName != null) {
-			classesFileName = FileUtilities.getAbsolutePath(classesFileName, kb.getProject());
+        if (classesFileName != null) {			
+        	classesFileName = URIUtilities.resolve(kb.getProject().getProjectURI(), classesFileName).toString();
 		}
         String instancesFileName = getInstancesFileName(sources);
         if (instancesFileName != null) {
-			instancesFileName = FileUtilities.getAbsolutePath(instancesFileName, kb.getProject());
+        	instancesFileName = URIUtilities.resolve(kb.getProject().getProjectURI(), instancesFileName).toString();
 		}
         String namespace = getNamespace(sources);
         Namespaces namespaces;
