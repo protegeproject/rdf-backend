@@ -13,6 +13,7 @@ import edu.stanford.smi.protege.widget.*;
 /** This is a modifiable AbstractListWidget, i.e., some swing
     components can be added (to the itsBorderLayoutPanel) */
 public abstract class ModifiableAbstractListWidget extends AbstractSlotWidget {
+    private static final long serialVersionUID = -7887382006986579074L;
     private JList itsList;
     private JPanel itsBorderLayoutPanel; // [MS]
     private LabeledComponent itsLabeledComponent;

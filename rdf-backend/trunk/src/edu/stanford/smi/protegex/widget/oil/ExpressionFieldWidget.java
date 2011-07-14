@@ -15,6 +15,7 @@ import edu.stanford.smi.protege.widget.*;
 /** This is a modified InstanceFieldWidget for showing expressions. */
 public class ExpressionFieldWidget extends AbstractSlotWidget {
 
+    private static final long serialVersionUID = 1824973146816376230L;
     private JList itsList;
     private Instance itsInstance;
     private AllowableAction createAction;
@@ -64,6 +65,8 @@ public class ExpressionFieldWidget extends AbstractSlotWidget {
 
     protected Action getCreateInstanceAction() {
         createAction = new CreateAction("Create Instance") {
+            private static final long serialVersionUID = -610960903582699721L;
+
             public void onCreate() {
                 Collection clses = getCls().getTemplateSlotAllowedClses(getSlot());
                 Cls cls = DisplayUtilities.pickConcreteCls(ExpressionFieldWidget.this, getKnowledgeBase(), clses);
@@ -87,6 +90,8 @@ public class ExpressionFieldWidget extends AbstractSlotWidget {
 
     protected Action getRemoveInstanceAction() {
         itsRemoveAction = new RemoveAction("Remove Instance", this) {
+            private static final long serialVersionUID = -5501295658808008824L;
+
             public void onRemove(Object o) {
                 removeDisplayedInstance();
             }
@@ -96,6 +101,8 @@ public class ExpressionFieldWidget extends AbstractSlotWidget {
 
     protected Action getSelectInstanceAction() {
         addAction = new AddAction("Add Instance") {
+            private static final long serialVersionUID = 9013637197574384827L;
+
             public void onAdd() {
                 Collection clses = getCls().getTemplateSlotAllowedClses(getSlot());
                 Instance instance = DisplayUtilities.pickInstance(ExpressionFieldWidget.this, clses);
@@ -117,6 +124,8 @@ public class ExpressionFieldWidget extends AbstractSlotWidget {
 
     protected Action getViewInstanceAction() {
         return new ViewAction("View Instance", this) {
+            private static final long serialVersionUID = -1023964800761519701L;
+
             public void onView(Object o) {
                 showInstance((Instance) o);
             }

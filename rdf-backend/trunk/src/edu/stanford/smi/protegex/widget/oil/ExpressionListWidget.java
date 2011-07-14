@@ -14,6 +14,7 @@ import edu.stanford.smi.protege.util.*;
 /** This is a modified InstanceListWidget for showing expressions. */
 public class ExpressionListWidget extends ModifiableAbstractListWidget {
 
+    private static final long serialVersionUID = -6199103954976842355L;
     private AllowableAction createInstanceAction;
     private AllowableAction addInstancesAction;
     private AllowableAction itsRemoveInstancesAction;
@@ -67,6 +68,8 @@ public class ExpressionListWidget extends ModifiableAbstractListWidget {
 
     private Action getAddInstancesAction() {
         addInstancesAction = new AddAction("Select Instances") {
+            private static final long serialVersionUID = -4948430651209447233L;
+
             public void onAdd() {
                 Collection clses = getCls().getTemplateSlotAllowedClses(getSlot());
                 addItems(
@@ -81,6 +84,8 @@ public class ExpressionListWidget extends ModifiableAbstractListWidget {
 
     public Action getCreateInstanceAction() {
         createInstanceAction = new CreateAction("Create Instance") {
+            private static final long serialVersionUID = -451434151609012356L;
+
             public void onCreate() {
                 Collection clses = getCls().getTemplateSlotAllowedClses(getSlot());
                 Cls cls = DisplayUtilities.pickConcreteCls(ExpressionListWidget.this, getKnowledgeBase(), clses);
@@ -104,6 +109,8 @@ public class ExpressionListWidget extends ModifiableAbstractListWidget {
 
     private Action getRemoveInstancesAction() {
         itsRemoveInstancesAction = new RemoveAction("Remove Selected Instances", this) {
+            private static final long serialVersionUID = -1374313966177328036L;
+
             public void onRemove(Collection instances) {
                 removeItems(instances);
                 itsExpressionWidgetHelper.prettyPrintExpressions();
@@ -114,6 +121,8 @@ public class ExpressionListWidget extends ModifiableAbstractListWidget {
 
     private Action getViewInstanceAction() {
         return new ViewAction("View Selected Instances", this) {
+            private static final long serialVersionUID = -1181388030403766936L;
+
             public void onView(Object o) {
                 showInstance((Instance) o);
             }

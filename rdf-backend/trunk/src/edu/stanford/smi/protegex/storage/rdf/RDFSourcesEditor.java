@@ -11,6 +11,8 @@ import edu.stanford.smi.protege.util.*;
 
 public class RDFSourcesEditor extends KnowledgeBaseSourcesEditor {
 
+    private static final long serialVersionUID = -5175060685082226111L;
+
     static final String PROTEGEURI = "http://protege.stanford.edu/";
 
     FileField _clsesField;
