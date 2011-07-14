@@ -95,6 +95,8 @@ public class Namespaces extends BaseNamespaces {
             }
         });
         DefaultTableModel model = new DefaultTableModel(rows, header) {
+            private static final long serialVersionUID = 4256057648484603249L;
+
             public boolean isCellEditable(int row, int column) {
                 return false; // DefaultTableModel returns true!
             }

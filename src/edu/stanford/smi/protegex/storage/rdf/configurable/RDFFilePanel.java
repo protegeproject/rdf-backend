@@ -11,6 +11,8 @@ import edu.stanford.smi.protege.util.*;
  * @author Ray Fergerson <fergerson@smi.stanford.edu>
  */
 public class RDFFilePanel extends JComponent {
+    private static final long serialVersionUID = -1414681288737331218L;
+
     public static final String DEFAULT_NAMESPACE = "http://protege.stanford.edu/rdf";
 
     private FileField clsesFileField;

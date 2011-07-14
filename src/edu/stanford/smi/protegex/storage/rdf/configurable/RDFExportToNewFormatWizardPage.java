@@ -15,6 +15,7 @@ import edu.stanford.smi.protege.util.*;
  * @author Ray Fergerson <fergerson@smi.stanford.edu>
  */
 public class RDFExportToNewFormatWizardPage extends WizardPage {
+    private static final long serialVersionUID = 4458927044894069943L;
     private FileField projectFileField;
     private JTextField clsesFileField;
     private JTextField instancesFileField;

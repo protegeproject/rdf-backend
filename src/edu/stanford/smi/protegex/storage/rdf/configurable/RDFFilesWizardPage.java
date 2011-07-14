@@ -14,6 +14,7 @@ import edu.stanford.smi.protege.util.*;
  * @author Ray Fergerson <fergerson@smi.stanford.edu>
  */
 public class RDFFilesWizardPage extends WizardPage {
+    private static final long serialVersionUID = 312973410556466278L;
     private FileField clsesFileField;
     private FileField instancesFileField;
     private JTextField namespaceField;

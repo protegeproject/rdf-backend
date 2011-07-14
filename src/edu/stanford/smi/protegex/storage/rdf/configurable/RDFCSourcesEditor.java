@@ -13,6 +13,7 @@ import edu.stanford.smi.protegex.storage.rdf.*;
 
 public class RDFCSourcesEditor extends RDFSourcesEditor {
 
+    private static final long serialVersionUID = -2449030369928073668L;
     // JRadioButton _useRoundtripBackendRB; // old version
     JCheckBox _useSimpleBackendCB;
 
@@ -104,6 +105,8 @@ public class RDFCSourcesEditor extends RDFSourcesEditor {
         }
 
         DefaultTableModel model = new DefaultTableModel(rows, header) {
+            private static final long serialVersionUID = -4575903975127505162L;
+
             public boolean isCellEditable(int row, int column) {
                 return column == 1;
             }
