@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+	 xmlns:rdfs="http://www.w3.org/TR/1999/PR-rdf-schema-19990303#"
+	 xmlns:oil="http://www.ontoknowledge.org/oil/rdf-schema/2000/11/10-oil-standard#">
+
+
+	<rdf:Property rdf:ID="eats">
+		<oil:inverseRelationOf rdf:resource="#is-eaten-by"/>
+	</rdf:Property>
+	<rdf:Property rdf:ID="is-eaten-by"/>
+	<rdf:Property rdf:ID="has-part">
+		<oil:inverseRelationOf rdf:resource="#is-part-of"/>
+	</rdf:Property>
+	<rdf:Property rdf:ID="is-part-of"/>
+	<rdfs:Class rdf:ID="animal"/>
+	<rdfs:Class rdf:ID="plant">
+		<oil:subClassOf>
+			<oil:Not>
+				<oil:hasOperand rdf:resource="#animal"/>
+			</oil:Not>
+		</oil:subClassOf>
+	</rdfs:Class>
+	<rdfs:Class rdf:ID="tree">
+		<rdfs:subClassOf rdf:resource="#plant"/>
+	</rdfs:Class>
+	<rdfs:Class rdf:ID="branch">
+		<oil:hasPropertyRestriction>
+			<oil:HasValue>
+				<oil:onProperty rdf:resource="#is-part-of"/>
+				<oil:toClass rdf:resource="#tree"/>
+			</oil:HasValue>
+		</oil:hasPropertyRestriction>
+	</rdfs:Class>
+	<rdfs:Class rdf:ID="leaf">
+		<oil:hasPropertyRestriction>
+			<oil:HasValue>
+				<oil:onProperty rdf:resource="#is-part-of"/>
+				<oil:toClass rdf:resource="#branch"/>
+			</oil:HasValue>
+		</oil:hasPropertyRestriction>
+	</rdfs:Class>
+	<rdfs:Class rdf:ID="carnivore">
+		<rdfs:subClassOf rdf:resource="#animal"/>
+		<oil:hasPropertyRestriction>
+			<oil:ValueType>
+				<oil:onProperty rdf:resource="#eats"/>
+				<oil:toClass rdf:resource="#animal"/>
+			</oil:ValueType>
+		</oil:hasPropertyRestriction>
+	</rdfs:Class>
+	<oil:DefinedClass rdf:ID="herbivore">
+		<rdfs:subClassOf rdf:resource="#animal"/>
+		<oil:subClassOf>
+			<oil:Not>
+				<oil:hasOperand rdf:resource="#carnivore"/>
+			</oil:Not>
+		</oil:subClassOf>
+		<oil:hasPropertyRestriction>
+			<oil:ValueType>
+				<oil:onProperty rdf:resource="#eats"/>
+				<oil:toClass>
+					<oil:Or>
+						<oil:hasOperand rdf:resource="#plant"/>
+						<oil:hasOperand>
+							<oil:HasValue>
+								<oil:onProperty rdf:resource="#is-part-of"/>
+								<oil:toClass rdf:resource="#plant"/>
+							</oil:HasValue>
+						</oil:hasOperand>
+					</oil:Or>
+				</oil:toClass>
+			</oil:ValueType>
+		</oil:hasPropertyRestriction>
+	</oil:DefinedClass>
+	<rdfs:Class rdf:ID="giraffe">
+		<rdfs:subClassOf rdf:resource="#animal"/>
+		<oil:hasPropertyRestriction>
+			<oil:ValueType>
+				<oil:onProperty rdf:resource="#eats"/>
+				<oil:toClass rdf:resource="#leaf"/>
+			</oil:ValueType>
+		</oil:hasPropertyRestriction>
+	</rdfs:Class>
+	<rdfs:Class rdf:ID="lion">
+		<rdfs:subClassOf rdf:resource="#animal"/>
+		<oil:hasPropertyRestriction>
+			<oil:ValueType>
+				<oil:onProperty rdf:resource="#eats"/>
+				<oil:toClass rdf:resource="#herbivore"/>
+			</oil:ValueType>
+		</oil:hasPropertyRestriction>
+	</rdfs:Class>
+	<rdfs:Class rdf:ID="tasty-plant">
+		<rdfs:subClassOf rdf:resource="#plant"/>
+		<oil:hasPropertyRestriction>
+			<oil:HasValue>
+				<oil:onProperty rdf:resource="#is-eaten-by"/>
+				<oil:toClass>
+					<oil:And>
+						<oil:hasOperand rdf:resource="#herbivore"/>
+						<oil:hasOperand rdf:resource="#carnivore"/>
+					</oil:And>
+				</oil:toClass>
+			</oil:HasValue>
+		</oil:hasPropertyRestriction>
+	</rdfs:Class>
+</rdf:RDF>
