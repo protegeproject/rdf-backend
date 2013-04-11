@@ -38,6 +38,12 @@ import edu.stanford.smi.protegex.storage.walker.protege.ProtegeFrameCreator;
 
 public class RDFFrameWalker implements FrameWalker {
 
+    public static final String OWL_NS = "http://www.w3.org/2002/07/owl#";
+    public static final String OWL_OBJECT_PROP = OWL_NS + "ObjectProperty";
+    public static final String OWL_DATATYPE_PROP = OWL_NS + "DatatypeProperty";
+    public static final String OWL_DATARANGE = OWL_NS + "DataRange";
+    public static final String OWL_RESTRICTION = OWL_NS + "Restriction";
+
     String _classesFileName;
     String _instancesFileName;
     String _namespace;
@@ -118,11 +124,12 @@ public class RDFFrameWalker implements FrameWalker {
 
     public boolean init() {
         // returns false if fatal error occurs
-        if (_differentInputSource)
+        if (_differentInputSource) {
             return getModels(_classesInputSource, _instancesInputSource);
         // Hack to load a Project from InputStreams
-        else
+        } else {
             return getModels(_classesFileName, _instancesFileName);
+        }
     }
     // #RV
 
@@ -133,8 +140,9 @@ public class RDFFrameWalker implements FrameWalker {
             Resource cls = (Resource) classIterator.next();
             if (isSystemResource(cls)) {
                 // we would like to allow this in the future!
-                if (!isEncodingSystemResource(cls))
+                if (!isEncodingSystemResource(cls)) {
                     error("system classes cannot be changed: " + cls);
+                }
                 continue;
             }
             Resource type = getDirectType(cls);
@@ -157,15 +165,19 @@ public class RDFFrameWalker implements FrameWalker {
     void walkInstances() {
         for (Iterator instIterator = sorted(_instances).iterator(); instIterator.hasNext();) {
             Resource instance = (Resource) instIterator.next();
+
             if (isSystemResource(instance)) {
                 // we would like to allow this in the future!
-                if (!isEncodingSystemResource(instance))
+                if (!isEncodingSystemResource(instance)) {
                     error("system resources cannot be changed: " + instance);
+                }
                 continue;
             }
             Resource type = getDirectType(instance);
-            String documentation = getComment(instance);
-            _creator.createInstance(wframe(instance), wframe(type), documentation);
+            if (!isOnNotCreateInstanceOfTypeList(type)) {
+                String documentation = getComment(instance);
+                _creator.createInstance(wframe(instance), wframe(type), documentation);
+            }
         }
     }
 
@@ -177,8 +189,9 @@ public class RDFFrameWalker implements FrameWalker {
                 if (isEncodingSystemResource(property)) {
                     // for now, we only handle :NAME that can be attached
                     // to some classes:
-                    if (!getLocalName(property).equals("_name")) // HACK!!!
+                    if (!getLocalName(property).equals("_name")) {
                         continue;
+                    }
                 } else {
                     error("system properties cannot be changed: " + property);
                     continue;
@@ -212,8 +225,9 @@ public class RDFFrameWalker implements FrameWalker {
             for (Iterator domainIterator = domain.iterator(); domainIterator.hasNext();) {
                 Resource domainResource = (Resource) domainIterator.next();
                 if (isSystemResource(domainResource)) {
-                    if (!isEncodingSystemResource(domainResource))
+                    if (!isEncodingSystemResource(domainResource)) {
                         error("system classes cannot be changed: " + domainResource);
+                    }
                 } else {
                     _creator.attachSlot(wframe(domainResource), propertyFrame, true, null, null);
                 }
@@ -231,12 +245,14 @@ public class RDFFrameWalker implements FrameWalker {
     public WalkerSlotRestriction getSlotRestriction(Resource property) {
         WalkerSlotRestriction slotRestriction = null;
         Resource rangeResource = getRange(property);
-        if (rangeResource != null)
-            if (rangeResource.equals(RDFS.Literal) || getSuperclasses(rangeResource).contains(RDFS.Literal))
+        if (rangeResource != null) {
+            if (rangeResource.equals(RDFS.Literal) || getSuperclasses(rangeResource).contains(RDFS.Literal)) {
                 slotRestriction = new RDFSlotRestriction();
         // else // check for XML Schema data types ... !!! XXX
-        else
-            slotRestriction = new RDFSlotRestriction(wframe(rangeResource));
+            } else {
+                slotRestriction = new RDFSlotRestriction(wframe(rangeResource));
+            }
+        }
         return slotRestriction;
     }
 
@@ -258,8 +274,9 @@ public class RDFFrameWalker implements FrameWalker {
             Resource instance = (Resource) instIterator.next();
             if (isSystemResource(instance)) {
                 // we would like to allow this in the future!
-                if (!classOrProperty && !isEncodingSystemResource(instance))
+                if (!classOrProperty && !isEncodingSystemResource(instance)) {
                     error("system resources cannot be changed: " + instance);
+                }
                 continue;
             }
             WalkerFrame instanceFrame = wframe(instance);
@@ -276,10 +293,14 @@ public class RDFFrameWalker implements FrameWalker {
                         if (valueNode instanceof Resource) {
                             Resource valueResource = (Resource) valueNode;
                             if (isEncodingSystemResource(valueResource))
+                             {
                                 continue; // ignore encoding values, they are handled elsewhere
+                            }
                             value = wframe(valueResource);
-                        } else
+                        }
+                        else {
                             value = getLabel(valueNode); // Literal
+                        }
                         _creator.addOwnSlotValues(
                             instanceFrame,
                             wframe(property),
@@ -301,7 +322,7 @@ public class RDFFrameWalker implements FrameWalker {
             Map.Entry unhandled = (Map.Entry) utIterator.next();
             Resource resource = (Resource) unhandled.getKey();
             Collection types = (Collection) unhandled.getValue();
-            
+
             //TT added support for multiple types
             if (!(_creator instanceof ProtegeFrameCreator)) {
                 error("Resource with more than one type not yet handled: " + resource + " ; unhandled types = " + types);
@@ -309,8 +330,8 @@ public class RDFFrameWalker implements FrameWalker {
                 // (i.e., rdf:type) ... !!!
             } else {
             	((ProtegeFrameCreator)_creator).addTypesToInstance(wframe(resource), wframes(types));
-            }            
-            
+            }
+
         }
     }
 
@@ -318,12 +339,12 @@ public class RDFFrameWalker implements FrameWalker {
 
     public Resource getDirectType(Resource resource) {
         Collection types = getValues(_spClosure, resource, RDF.type);
-        if (types.isEmpty()) // ???
+        if (types.isEmpty()) {
             return null;
-        else if (types.size() == 1)
+        } else if (types.size() == 1) {
             // check that type is not a literal!
             return (Resource) types.iterator().next();
-        else { // more than one type; pick main one and remember others
+        } else { // more than one type; pick main one and remember others
             Resource type = pickMainType(types);
             ArrayList unhandled = new ArrayList(types);
             unhandled.remove(type);
@@ -340,12 +361,15 @@ public class RDFFrameWalker implements FrameWalker {
         ArrayList w3Types = new ArrayList();
         for (Iterator typeIterator = types.iterator(); typeIterator.hasNext();) {
             Resource type = (Resource) typeIterator.next();
-            if (getURI(type).startsWith("http://www.w3.org"))
+            if (getURI(type).startsWith("http://www.w3.org")) {
                 w3Types.add(type);
+            }
         }
         // pick "shortest" type (often the superclass if you have "marker classes")
         if (!w3Types.isEmpty())
+         {
             types = w3Types; // use w3 types
+        }
         Resource mainType = null;
         int minlen = 0;
         for (Iterator typeIterator = types.iterator(); typeIterator.hasNext();) {
@@ -361,16 +385,17 @@ public class RDFFrameWalker implements FrameWalker {
 
     public String getComment(Resource resource) {
         Collection comments = getValues(_spClosure, resource, RDFS.comment);
-        if (comments.isEmpty())
+        if (comments.isEmpty()) {
             return null;
-        else {
+        } else {
             StringBuffer commentBuffer = new StringBuffer();
             for (Iterator commentIterator = comments.iterator(); commentIterator.hasNext();) {
                 RDFNode comment = (RDFNode) commentIterator.next();
                 commentBuffer.append(getLabel(comment)); // not correct for
                 // comments that are resources ... !!!
-                if (commentIterator.hasNext())
+                if (commentIterator.hasNext()) {
                     commentBuffer.append("\n");
+                }
             }
             return commentBuffer.toString();
         }
@@ -469,11 +494,11 @@ public class RDFFrameWalker implements FrameWalker {
 
     public Resource getRange(Resource property) {
         Collection ranges = getValues(_rdfSchemaModel, property, RDFS.range);
-        if (ranges.isEmpty())
+        if (ranges.isEmpty()) {
             return null;
-        else if (ranges.size() == 1)
+        } else if (ranges.size() == 1) {
             return (Resource) ranges.iterator().next();
-        else {
+        } else {
             error("property has more than one range: " + property + " ; ranges = " + ranges);
             return null;
         }
@@ -504,7 +529,7 @@ public class RDFFrameWalker implements FrameWalker {
             // transform new to old namespace:
             // (at the moment, we do not reverse this effect when
             //  saving ... !!!)
-            
+
             // rwf Hack this to use the new namespace.  Why was the old one intentionally used?
             _model = _rdfFactory.createModel();
             Util.filterModel(
@@ -657,37 +682,41 @@ public class RDFFrameWalker implements FrameWalker {
 
     public RDFNode getValue(Model model, Resource resource, Resource property) {
         Collection values = getValues(model, resource, property);
-        if (values.size() == 1)
+        if (values.size() == 1) {
             try {
                 return (RDFNode) values.iterator().next();
             } catch (Exception e) {
                 error(e);
                 return null;
-            } else
+            }
+        } else {
             return null;
+        }
     }
 
     public Resource getResourceValue(Model model, Resource resource, Resource property) {
         RDFNode value = getValue(model, resource, property);
-        if (value != null && value instanceof Resource)
+        if (value != null && value instanceof Resource) {
             return (Resource) value;
-        else
+        } else {
             return null;
+        }
     }
 
     public String getStringValue(Model model, Resource resource, Resource property) {
         RDFNode value = getValue(model, resource, property);
-        if (value != null)
+        if (value != null) {
             return getLabel(value);
-        else
+        } else {
             return null;
+        }
     }
 
     public int getIntValue(Model model, Resource resource, Resource property, int defaultValue) {
         String value = getStringValue(model, resource, property);
-        if (value == null)
+        if (value == null) {
             return defaultValue;
-        else { // parse
+        } else { // parse
             try {
                 return Integer.parseInt(value);
             } catch (Exception e) {
@@ -697,7 +726,7 @@ public class RDFFrameWalker implements FrameWalker {
     }
 
     /* unused
-    public Float getFloatValue(Model model, Resource resource, 
+    public Float getFloatValue(Model model, Resource resource,
         Resource property) {
       String value = getStringValue(model, resource, property);
       if (value == null)
@@ -737,16 +766,17 @@ public class RDFFrameWalker implements FrameWalker {
     public Collection wframes(Collection values) {
         // values must be RDFNodes!
         // result list is sorted
-        if (values == null)
+        if (values == null) {
             return null;
-        else {
+        } else {
             ArrayList wframes = new ArrayList();
             for (Iterator valueIterator = values.iterator(); valueIterator.hasNext();) {
                 RDFNode value = (RDFNode) valueIterator.next();
-                if (value instanceof Resource)
+                if (value instanceof Resource) {
                     wframes.add(wframe((Resource) value));
-                else
+                } else {
                     wframes.add(getLabel(value));
+                }
             }
             sort(wframes);
             return wframes;
@@ -818,7 +848,7 @@ public class RDFFrameWalker implements FrameWalker {
 
     public boolean isSystemResource(Resource resource) {
         String uri = getURI(resource);
-        return uri.startsWith(RDF._Namespace) || uri.startsWith(RDFS._Namespace) || isEncodingSystemResource(resource);
+        return uri.startsWith(RDF._Namespace) || uri.startsWith(RDFS._Namespace) || uri.startsWith(OWL_NS) || isEncodingSystemResource(resource);
     }
 
     public boolean isSimpleSystemProperty(Resource resource) {
@@ -834,6 +864,11 @@ public class RDFFrameWalker implements FrameWalker {
     // this is then automatically excluded
     public boolean isEncodingSystemResource(Resource resource) {
         return false;
+    }
+
+    public boolean isOnNotCreateInstanceOfTypeList(Resource resource) {
+        String uri = getURI(resource);
+        return uri.equals(OWL_DATARANGE) || uri.equals(OWL_RESTRICTION);
     }
 
     // sorting
@@ -867,21 +902,23 @@ public class RDFFrameWalker implements FrameWalker {
             String v1s;
             String v2s;
             try {
-                if (v1 instanceof Resource)
+                if (v1 instanceof Resource) {
                     v1s = ((Resource) v1).getURI();
                 // we should use ns abbrev+local name instead of URI, but
                 // we cannot access the ns abbreviations here!!! ...
-                else
+                } else {
                     v1s = v1.toString();
+                }
             } catch (Exception e) {
                 error(e);
                 v1s = v1.toString();
             }
             try {
-                if (v2 instanceof Resource)
+                if (v2 instanceof Resource) {
                     v2s = ((Resource) v2).getURI();
-                else
+                } else {
                     v2s = v2.toString();
+                }
             } catch (Exception e) {
                 error(e);
                 v2s = v2.toString();

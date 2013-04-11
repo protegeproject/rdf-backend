@@ -1,9 +1,22 @@
 package edu.stanford.smi.protegex.storage.walker.protege;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.Map;
 
-import edu.stanford.smi.protege.model.*;
-import edu.stanford.smi.protegex.storage.walker.*;
+import edu.stanford.smi.protege.model.Cls;
+import edu.stanford.smi.protege.model.Facet;
+import edu.stanford.smi.protege.model.Frame;
+import edu.stanford.smi.protege.model.Instance;
+import edu.stanford.smi.protege.model.KnowledgeBase;
+import edu.stanford.smi.protege.model.Slot;
+import edu.stanford.smi.protege.model.ValueType;
+import edu.stanford.smi.protegex.storage.rdf.RDFFrameWalker;
+import edu.stanford.smi.protegex.storage.walker.FrameCreator;
+import edu.stanford.smi.protegex.storage.walker.WalkerFrame;
+import edu.stanford.smi.protegex.storage.walker.WalkerSlotRestriction;
 
 public class ProtegeFrameCreator implements FrameCreator {
 
@@ -48,9 +61,9 @@ public class ProtegeFrameCreator implements FrameCreator {
             }
         }
         // add superclasses (delete old ones?) ... !!!
-        if (superclasses == null || superclasses.isEmpty())
+        if (superclasses == null || superclasses.isEmpty()) {
             cls.addDirectSuperclass(getThing());
-        else {
+        } else {
             Collection superClassesToRemove = new ArrayList(cls.getDirectSuperclasses());
             for (Iterator scIterator = superclasses.iterator(); scIterator.hasNext();) {
                 WalkerFrame superclass = (WalkerFrame) scIterator.next();
@@ -67,8 +80,9 @@ public class ProtegeFrameCreator implements FrameCreator {
             }
         }
         cls.setAbstract(abstrct);
-        if (documentation != null)
+        if (documentation != null) {
             cls.setDocumentation(documentation);
+        }
     }
 
     public boolean singleAllowedClass() {
@@ -89,8 +103,9 @@ public class ProtegeFrameCreator implements FrameCreator {
                 // System.out.println("setting type: " + type);
             }
         }
-        if (documentation != null)
+        if (documentation != null) {
             instance.setDocumentation(documentation);
+        }
     }
 
     public void createSlot(
@@ -121,18 +136,22 @@ public class ProtegeFrameCreator implements FrameCreator {
             }
         }
         // inverse slot
-        if (inverseSlot != null)
+        if (inverseSlot != null) {
             slot.setInverseSlot(getSlot(inverseSlot));
+        }
         // FACET
         // associated facet
-        if (associatedFacet != null)
+        if (associatedFacet != null) {
             slot.setAssociatedFacet(getFacet(associatedFacet, slot));
+        }
         // slot restriction
-        if (slotRestriction != null)
+        if (slotRestriction != null) {
             restrictSlot(slot, slotRestriction);
+        }
         // documentation
-        if (documentation != null)
+        if (documentation != null) {
             slot.setDocumentation(documentation);
+        }
     }
 
     void restrictSlot(Slot slot, WalkerSlotRestriction slotRestriction) {
@@ -145,16 +164,18 @@ public class ProtegeFrameCreator implements FrameCreator {
         } else if (slotRestriction.isClass()) {
             slot.setValueType(ValueType.CLS);
             Collection allowedParents = slotRestriction.getAllowedParents();
-            if (allowedParents == null)
+            if (allowedParents == null) {
                 allowedParents = Collections.EMPTY_LIST;
+            }
             slot.setAllowedParents(getClses(allowedParents));
         } else if (slotRestriction.isFloat()) {
             slot.setValueType(ValueType.FLOAT);
         } else if (slotRestriction.isInstance()) {
             slot.setValueType(ValueType.INSTANCE);
             Collection allowedClasses = slotRestriction.getAllowedClasses();
-            if (allowedClasses == null)
+            if (allowedClasses == null) {
                 allowedClasses = Collections.EMPTY_LIST;
+            }
             slot.setAllowedClses(getClses(allowedClasses));
         } else if (slotRestriction.isInteger()) {
             slot.setValueType(ValueType.INTEGER);
@@ -163,8 +184,9 @@ public class ProtegeFrameCreator implements FrameCreator {
         } else if (slotRestriction.isSymbol()) {
             slot.setValueType(ValueType.SYMBOL);
             Collection allowedValues = slotRestriction.getAllowedValues();
-            if (allowedValues == null)
+            if (allowedValues == null) {
                 allowedValues = Collections.EMPTY_LIST;
+            }
             slot.setAllowedValues(allowedValues);
         }
 
@@ -188,12 +210,14 @@ public class ProtegeFrameCreator implements FrameCreator {
 
         // default and slot values
         Collection defaultValues = slotRestriction.getDefaultValues();
-        if (defaultValues == null)
+        if (defaultValues == null) {
             defaultValues = Collections.EMPTY_LIST;
+        }
         slot.setDefaultValues(getValues(defaultValues, slot.getValueType()));
         Collection values = slotRestriction.getValues();
-        if (values == null)
+        if (values == null) {
             values = Collections.EMPTY_LIST;
+        }
         slot.setValues(getValues(values, slot.getValueType()));
 
         // FACET
@@ -210,8 +234,9 @@ public class ProtegeFrameCreator implements FrameCreator {
         // System.out.println("attachSlot " + clsFrame + " " + slotFrame);
         Cls cls = getCls(clsFrame);
         Slot slot = getSlot(slotFrame);
-        if (direct)
+        if (direct) {
             cls.addDirectTemplateSlot(slot);
+        }
         if (overriddenSlotRestriciton != null) {
             restrictSlot(cls, slot, overriddenSlotRestriciton);
         }
@@ -237,16 +262,18 @@ public class ProtegeFrameCreator implements FrameCreator {
         } else if (slotRestriction.isClass()) {
             cls.setTemplateSlotValueType(slot, ValueType.CLS);
             Collection allowedParents = slotRestriction.getAllowedParents();
-            if (allowedParents == null)
+            if (allowedParents == null) {
                 allowedParents = Collections.EMPTY_LIST;
+            }
             cls.setTemplateSlotAllowedParents(slot, getClses(allowedParents));
         } else if (slotRestriction.isFloat()) {
             cls.setTemplateSlotValueType(slot, ValueType.FLOAT);
         } else if (slotRestriction.isInstance()) {
             cls.setTemplateSlotValueType(slot, ValueType.INSTANCE);
             Collection allowedClasses = slotRestriction.getAllowedClasses();
-            if (allowedClasses == null)
+            if (allowedClasses == null) {
                 allowedClasses = Collections.EMPTY_LIST;
+            }
             cls.setTemplateSlotAllowedClses(slot, getClses(allowedClasses));
         } else if (slotRestriction.isInteger()) {
             cls.setTemplateSlotValueType(slot, ValueType.INTEGER);
@@ -255,8 +282,9 @@ public class ProtegeFrameCreator implements FrameCreator {
         } else if (slotRestriction.isSymbol()) {
             cls.setTemplateSlotValueType(slot, ValueType.SYMBOL);
             Collection allowedValues = slotRestriction.getAllowedValues();
-            if (allowedValues == null)
+            if (allowedValues == null) {
                 allowedValues = Collections.EMPTY_LIST;
+            }
             cls.setTemplateSlotAllowedValues(slot, allowedValues);
         }
 
@@ -276,12 +304,14 @@ public class ProtegeFrameCreator implements FrameCreator {
 
         // default and template slot values
         Collection defaultValues = slotRestriction.getDefaultValues();
-        if (defaultValues == null)
+        if (defaultValues == null) {
             defaultValues = Collections.EMPTY_LIST;
+        }
         cls.setTemplateSlotDefaultValues(slot, getValues(defaultValues, slot.getValueType()));
         Collection values = slotRestriction.getValues();
-        if (values == null)
+        if (values == null) {
             values = Collections.EMPTY_LIST;
+        }
         cls.setTemplateSlotValues(slot, getValues(values, slot.getValueType()));
 
         // FACET
@@ -329,7 +359,7 @@ public class ProtegeFrameCreator implements FrameCreator {
             for (Iterator vIterator = pvalues.iterator(); vIterator.hasNext();) {
                 Object pvalue = vIterator.next();
                 instance.addOwnSlotValue(slot, pvalue);
-                
+
             }
         }
     }
@@ -343,8 +373,9 @@ public class ProtegeFrameCreator implements FrameCreator {
             Collection superclasses = cls.getDirectSuperclasses();
             if (superclasses == null
                 || superclasses.isEmpty()
-                && !cls.isSystem()) // don't do this with :THING!! (???!!!)
+                && !cls.isSystem()) {
                 cls.addDirectSuperclass(getUndefinedClass());
+            }
         }
     }
 
@@ -355,14 +386,14 @@ public class ProtegeFrameCreator implements FrameCreator {
 
     Cls getCls(WalkerFrame frame) {
         Frame specialFrame = getSpecialFrame(frame);
-        if (specialFrame != null)
+        if (specialFrame != null) {
             return (Cls) specialFrame; // check if it is a class!
-        else {
+        } else {
             String name = frameName(frame);
             Cls cls = _kb.getCls(name);
-            if (cls != null)
+            if (cls != null) {
                 return cls;
-            else {
+            } else {
                 Cls type = getStandardClass();
                 cls = _kb.createCls(name, Collections.EMPTY_LIST, type);
                 // superclasses MUST be added later! (see finish())
@@ -391,14 +422,14 @@ public class ProtegeFrameCreator implements FrameCreator {
 
     Slot getSlot(WalkerFrame frame) {
         Frame specialFrame = getSpecialFrame(frame);
-        if (specialFrame != null)
+        if (specialFrame != null) {
             return (Slot) specialFrame; // check if it is a slot!
-        else {
+        } else {
             String name = frameName(frame);
             Slot slot = _kb.getSlot(name);
-            if (slot != null)
+            if (slot != null) {
                 return slot;
-            else {
+            } else {
                 Cls type = getStandardSlot();
                 slot = _kb.createSlot(name, type);
                 // make it "unrestricted", i.e. multiple any (and not single string)
@@ -413,15 +444,16 @@ public class ProtegeFrameCreator implements FrameCreator {
     // FACET
     Facet getFacet(WalkerFrame frame) {
         Frame specialFrame = getSpecialFrame(frame);
-        if (specialFrame != null)
+        if (specialFrame != null) {
             return (Facet) specialFrame; // check if it is a facet!
-        else {
+        } else {
             String name = frameName(frame);
             Facet facet = _kb.getFacet(name);
             if (facet != null) {
                 Slot slot = facet.getAssociatedSlot();
-                if (slot == null)
+                if (slot == null) {
                     error("facet not correctly defined: " + frame);
+                }
                 return facet;
             } else {
                 error("facet not defined: " + frame);
@@ -432,9 +464,9 @@ public class ProtegeFrameCreator implements FrameCreator {
 
     Facet getFacet(WalkerFrame frame, Slot slot) {
         Frame specialFrame = getSpecialFrame(frame);
-        if (specialFrame != null)
+        if (specialFrame != null) {
             return (Facet) specialFrame; // check if it is a facet!
-        else {
+        } else {
             String name = frameName(frame);
             Facet facet = _kb.getFacet(name);
             if (facet != null) {
@@ -457,24 +489,25 @@ public class ProtegeFrameCreator implements FrameCreator {
     Instance getInstance(WalkerFrame frame, WalkerFrame typeFrame) {
         // works for simple instances AND classes/slots, but not facets!
         Instance instance = (Instance) getSpecialFrame(frame);
-        if (instance != null)
+        if (instance != null) {
             return instance;
-        else {
+        } else {
             String name = frameName(frame);
             instance = _kb.getInstance(name);
-            if (instance != null)
+            if (instance != null) {
                 return instance;
-            else {
+            } else {
                 Cls type = (typeFrame == null) ? null : getCls(typeFrame);
                 if (type == null) {
                     // this is important since one cannot change a simple
                     // instance into a slot or class, etc.
-                    if (frame.isClass())
+                    if (frame.isClass()) {
                         type = getStandardClass();
-                    else if (frame.isSlot())
+                    } else if (frame.isSlot()) {
                         type = getStandardSlot();
-                    else
+                    } else {
                         type = getThing();
+                    }
                 }
                 // makeConcrete(type);
                 instance = _kb.createInstance(name, type);
@@ -486,17 +519,19 @@ public class ProtegeFrameCreator implements FrameCreator {
 
     Object getValue(Object value, ValueType valueType) {
         // convert simple values (i.e., no WalkerFrames)
-        if (value == null)
+        if (value == null) {
             return null;
+        }
         String valueString = value.toString();
         if (valueType.equals(ValueType.ANY)) {
             return value; // or: valueString ... ???
         } else if (valueType.equals(ValueType.BOOLEAN)) {
-            if (valueString.trim().toLowerCase().startsWith("t"))
+            if (valueString.trim().toLowerCase().startsWith("t")) {
                 // catches true, TRUE, True, ...
                 return Boolean.TRUE;
-            else
+            } else {
                 return Boolean.FALSE;
+            }
         } else if (valueType.equals(ValueType.FLOAT)) {
             try {
                 return new Float(valueString);
@@ -523,36 +558,42 @@ public class ProtegeFrameCreator implements FrameCreator {
         for (Iterator valueIterator = values.iterator(); valueIterator.hasNext();) {
             Object value = valueIterator.next();
             if (value instanceof WalkerFrame) {
-                if (valueType != ValueType.ANY && valueType != ValueType.INSTANCE && valueType != ValueType.CLS)
+                if (valueType != ValueType.ANY && valueType != ValueType.INSTANCE && valueType != ValueType.CLS) {
                     error("value must be of type " + valueType + ": " + value);
-                else
+                } else {
                     returnValues.add(getInstance((WalkerFrame) value));
+                }
             } else {
-                if (valueType == ValueType.INSTANCE || valueType == ValueType.CLS)
+                if (valueType == ValueType.INSTANCE || valueType == ValueType.CLS) {
                     error("value must be of type " + valueType + ": " + value);
-                else
+                } else {
                     returnValues.add(getValue(value, valueType));
+                }
             }
         }
         return returnValues;
     }
 
     void makeConcrete(Cls type) {
-        if (type.isAbstract())
+        if (type.isAbstract()) {
             type.setAbstract(false);
+        }
     }
 
     // handling of special frames
 
     Frame getSpecialFrame(WalkerFrame frame) {
-        if (frame.isThing())
+        if (frame.isThing()) {
             return getThing();
-        else if (frame.isStandardClass())
+        } else if (frame.isStandardClass()) {
             return getStandardClass();
-        else if (frame.isStandardSlot())
+        } else if (frame.isStandardSlot()) {
             return getStandardSlot();
-        else // add here ... FACET ???? !!!
+        } else if (frame.getName().startsWith(RDFFrameWalker.OWL_NS) && frame.getName().endsWith("Property")) {
+            return getStandardSlot();
+        } else {
             return null;
+        }
     }
 
     // return special frames
@@ -587,6 +628,10 @@ public class ProtegeFrameCreator implements FrameCreator {
         */
     }
 
+    private boolean isOWLEntity(WalkerFrame frame) {
+        return frame.getName().startsWith(RDFFrameWalker.OWL_NS);
+    }
+
     // frame name
 
     String frameName(WalkerFrame walkerFrame) {
@@ -606,19 +651,19 @@ public class ProtegeFrameCreator implements FrameCreator {
 
     //added to support multiple types
 	public void addTypesToInstance(WalkerFrame wframe, Collection wTypes) {
-		
+
 		Instance instance = getInstance(wframe);
-		
+
 		for (Iterator iter = wTypes.iterator(); iter.hasNext();) {
 			WalkerFrame wType = (WalkerFrame) iter.next();
-		
+
 			Cls type = getCls(wType);
-			
+
 			if (type != null && !instance.hasType(type)) {
 				instance.addDirectType(type);
 			}
 		}
-		
+
 	}
 
 }
