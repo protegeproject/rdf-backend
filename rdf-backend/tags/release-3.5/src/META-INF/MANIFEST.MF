@@ -1,0 +1,20 @@
+Manifest-Version: 1.0
+
+Name: edu/stanford/smi/protegex/storage/rdf/configurable/RDFCBackend.class
+Storage-Factory: True
+
+Name: edu/stanford/smi/protegex/widget/oil/ExpressionFieldWidget.class
+Slot-Widget: True
+
+Name: edu/stanford/smi/protegex/widget/oil/ExpressionListWidget.class
+Slot-Widget: True
+
+Name: edu/stanford/smi/protegex/storage/rdf/configurable/RDFExportPlugin.class
+Export-Plugin: True
+
+Name: edu/stanford/smi/protegex/storage/rdf/configurable/RDFExportProjectPlugin.class
+Export-Project-Plugin: True
+
+Name: edu/stanford/smi/protegex/storage/rdf/configurable/RDFCreateProjectPlugin.class
+Create-Project-Plugin: True
+
